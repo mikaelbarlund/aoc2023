@@ -9,6 +9,11 @@ fun main(args: Array<String>) {
         println(day2_1(fileContent))
         println(day2_2(fileContent))
     }
+    fileContent = readFileAsLinesUsingUseLines("03_1.txt")
+    if (fileContent != null) {
+        println(day3_1(fileContent))
+        println(day3_2(fileContent))
+    }
 }
 
 fun readFileAsLinesUsingUseLines(fileName: String): List<String>? =
