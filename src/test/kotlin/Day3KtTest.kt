@@ -15,6 +15,10 @@ class Day3KtTest : FunSpec({
         ".664.598.."
     )
 
+    test("day3_1firstGo") {
+        val result = day3_1firstGo(testData)
+        result.shouldBe(4361)
+    }
     test("day3_1") {
         val result = day3_1(testData)
         result.shouldBe(4361)
@@ -24,4 +28,5 @@ class Day3KtTest : FunSpec({
         val result = day3_2(testData)
         result.shouldBe(467835)
     }
+
 })

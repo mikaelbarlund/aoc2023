@@ -1,14 +1,15 @@
-fun day3_1(fileContent: List<String>): Any {
+fun day3_1firstGo(fileContent: List<String>): Any {
     val input = fileContent.map { line -> (".$line.").toCharArray().map { it.toString() } }
     val emptyLine = listOf((1..input[0].size).map { "." })
     val grid = emptyLine + input + emptyLine
-    var tmp = ""
-    var isPart = false
+
     val x = grid.foldIndexed(0) { x, acc, yes ->
-        acc + yes.foldIndexed(0) { y, lineacc, cell ->
-            var foo = lineacc
+        acc + yes.foldIndexed(Triple(0, "", false)) { y, lineacc, cell ->
+            var foo = lineacc.first
+            var tmp = lineacc.second
+            var isPart = lineacc.third
             if (cell.toDoubleOrNull() != null) {
-                isPart = isPart || adjeacentSymbol(y, x, grid)
+                isPart = isPart || adjacentSymbol(y, x, grid)
                 tmp = if (tmp == "")
                     cell
                 else
@@ -21,13 +22,29 @@ fun day3_1(fileContent: List<String>): Any {
                     isPart = false
                     tmp = ""
                 }
-            foo
-        }
+            Triple(foo, tmp, isPart)
+        }.first
     }
     return x
 }
 
-private fun adjeacentSymbol(
+fun day3_1(fileContent: List<String>): Any {
+    val input = fileContent.map { line -> (".$line.").toCharArray().map { it.toString() } }
+    val emptyLine = listOf((1..input[0].size).map { "." })
+    val grid = emptyLine + input + emptyLine
+    val x = grid.foldIndexed(0) { x, acc, line ->
+        acc + line.foldIndexed(Triple(0, "", false)) { y, lineacc, cell ->
+            Triple(
+                if (cell.toDoubleOrNull() == null && lineacc.second != "" && lineacc.third) lineacc.first + lineacc.second.toInt() else lineacc.first,
+                if (cell.toDoubleOrNull() != null) (if (lineacc.second == "") cell else lineacc.second + cell) else "",
+                (cell.toDoubleOrNull() != null) && (lineacc.third || adjacentSymbol(y, x, grid))
+            )
+        }.first
+    }
+    return x
+}
+
+private fun adjacentSymbol(
     y: Int,
     x: Int,
     grid: List<List<String>>
