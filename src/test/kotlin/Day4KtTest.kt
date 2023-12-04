@@ -19,7 +19,7 @@ class Day4KtTest : FunSpec({
 
     test("day4_2") {
         val result = day4_2(testData)
-        result.shouldBe(467835)
+        result.shouldBe(30)
     }
 
 })

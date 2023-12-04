@@ -13,7 +13,19 @@ fun day4_1(fileContent: List<String>): Any {
 }
 
 fun day4_2(fileContent: List<String>): Any {
-    val input = fileContent.map { line -> (".$line.").toCharArray().map { it.toString() } }
+    val rows = fileContent.map { it.substring(8).split("|") }
+        .map { Pair(it[0].trim().split("\\s+".toRegex()), it[1].trim().split("\\s+".toRegex())) }
+        .foldIndexed(Pair(0, fileContent.indices.map { 1 })) { i, acc, it ->
+            val matches = it.first.fold(0) { card, num ->
+                if (it.second.contains(num)) card + 1 else card
+            }
+            Pair(acc.first + acc.second[0], newxtCards(matches, acc.second))
+        }
+    return rows.first
+}
 
-    return 1
+fun newxtCards(matches: Int, cards: List<Int>): List<Int> {
+    return cards.slice(1..cards.size - 1).mapIndexed { i, it ->
+        if (i < matches) it + cards[0] else it
+    }
 }
