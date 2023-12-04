@@ -8,7 +8,7 @@ fun day3_1firstGo(fileContent: List<String>): Any {
             var foo = lineacc.first
             var tmp = lineacc.second
             var isPart = lineacc.third
-            if (cell.toDoubleOrNull() != null) {
+            if (isDigit(cell)) {
                 isPart = isPart || adjacentSymbol(y, x, grid)
                 tmp = if (tmp == "")
                     cell
@@ -35,14 +35,16 @@ fun day3_1(fileContent: List<String>): Any {
     val x = grid.foldIndexed(0) { x, acc, line ->
         acc + line.foldIndexed(Triple(0, "", false)) { y, lineacc, cell ->
             Triple(
-                if (cell.toDoubleOrNull() == null && lineacc.second != "" && lineacc.third) lineacc.first + lineacc.second.toInt() else lineacc.first,
-                if (cell.toDoubleOrNull() != null) (if (lineacc.second == "") cell else lineacc.second + cell) else "",
-                (cell.toDoubleOrNull() != null) && (lineacc.third || adjacentSymbol(y, x, grid))
+                if (!isDigit(cell) && lineacc.second != "" && lineacc.third) lineacc.first + lineacc.second.toInt() else lineacc.first,
+                if (isDigit(cell)) (if (lineacc.second == "") cell else lineacc.second + cell) else "",
+                isDigit(cell) && (lineacc.third || adjacentSymbol(y, x, grid))
             )
         }.first
     }
     return x
 }
+
+private fun isDigit(cell: String) = cell.toDoubleOrNull() != null
 
 private fun adjacentSymbol(
     y: Int,
@@ -58,6 +60,53 @@ fun isSymbol(s: String): Boolean {
     return s != "." && s.toDoubleOrNull() == null
 }
 
+fun isGear(s: String): Boolean {
+    return s == "*"
+}
+
 fun day3_2(fileContent: List<String>): Any {
-    return 1
+    val input = fileContent.map { line -> (".$line.").toCharArray().map { it.toString() } }
+    val emptyLine = listOf((1..input[0].size).map { "." })
+    val grid = emptyLine + input + emptyLine
+
+    val parts = (0..grid.size - 1).fold(emptyArray()) { acc: Array<Pair<Int, List<Pair<Int, Int>>>>, x ->
+        acc + (0..grid[0].size - 1).fold(emptyArray()) { acc1: Array<Pair<Int, List<Pair<Int, Int>>>>, y ->
+            if (isDigit(grid[x][y]) && !isDigit(grid[x][y - 1])) acc1 + arrayOf(toPair(getNum(grid, x, y), x, y)) else
+                acc1
+        }
+    }
+    val gears = grid.foldIndexed(emptyList()) { x, acc: List<Pair<Int, Int>>, line ->
+        acc + line.foldIndexed(emptyList()) { y, acc1: List<Pair<Int, Int>>, cell ->
+            if (isGear(cell)) acc1 + listOf(Pair(x, y)) else acc1
+        }
+    }
+    val x = gears.fold(0) { acc, it ->
+        acc + findAdjacents(it, parts)
+    }
+    return x
+}
+
+fun findAdjacents(gear: Pair<Int, Int>, parts: Array<Pair<Int, List<Pair<Int, Int>>>>): Int {
+    val adjacents = parts.filter {
+        it.second.fold(false) { isNear, partLoc ->
+            isNear || (
+                    gear.first <= partLoc.first + 1 &&
+                            gear.first >= partLoc.first - 1 &&
+                            gear.second <= partLoc.second + 1 &&
+                            gear.second >= partLoc.second - 1
+                    )
+        }
+    }.map { it.first }
+
+    return if (adjacents.size == 2) adjacents.reduce { a, b -> a * b } else 0
+}
+
+fun toPair(num: String, x: Int, y: Int): Pair<Int, List<Pair<Int, Int>>> {
+    return Pair(num.toInt(), (0..num.length - 1).map {
+        Pair(x, y + it)
+    })
+}
+
+fun getNum(grid: List<List<String>>, x: Int, y: Int): String {
+    return grid[x].slice(y..grid[x].size - 1).takeWhile { isDigit(it) }.reduce { acc, it -> acc + it }
 }
