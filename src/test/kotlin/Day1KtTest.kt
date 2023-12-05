@@ -2,29 +2,15 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 class Day1KtTest : FunSpec({
-
+    val fileContent1 = readFileAsLinesUsingUseLines("01_1.txt")
     test("day1_1") {
-        val testData = listOf(
-            "1abc2",
-            "pqr3stu8vwx",
-            "a1b2c3d4e5f",
-            "treb7uchet"
-        )
-        val result = day1_1(testData)
+        val result = day1_1(fileContent1)
         result.shouldBe(142)
     }
 
+    val fileContent2 = readFileAsLinesUsingUseLines("01_2.txt")
     test("day1_2") {
-        val testData = listOf(
-            "two1nine",
-            "eightwothree",
-            "abcone2threexyz",
-            "xtwone3four",
-            "4nineeightseven2",
-            "zoneight234",
-            "7pqrstsixteen"
-        )
-        val result = day1_2(testData)
+        val result = day1_2(fileContent2)
         result.shouldBe(281)
     }
 })
