@@ -10,6 +10,6 @@ class Day6KtTest : FunSpec({
 
     test("day6_2") {
         val result = day6_2(fileContent1)
-        result.shouldBe(46)
+        result.shouldBe(71503)
     }
 })

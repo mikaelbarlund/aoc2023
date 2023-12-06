@@ -15,6 +15,13 @@ fun day6_1(fileContent: List<String>): Any {
 
 
 fun day6_2(fileContent: List<String>): Any {
-    return 1
+    val input = fileContent
+        .map { a -> a.split(":")[1].replace(" ", "").toLong() }
+    val race = Pair(input[0], input[1])
+    println(race)
+    return (0.toLong()..race.first).fold(0) { acc2, it2 ->
+        acc2 + if (it2 * (race.first - it2) > race.second) 1 else 0
+
+    }
 }
 
