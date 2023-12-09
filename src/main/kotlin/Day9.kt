@@ -21,5 +21,11 @@ tailrec fun getNextSequence(sequence: List<Long>, nextSequence: List<Long>): Lis
 }
 
 fun day9_2(fileContent: List<String>): Any {
-    return 1
+    val x = fileContent.map { it.split(" ").map { it.toLong() } }
+        .map { addSequence(listOf(it)) }
+    val y = x.map { a -> a.map { b -> b.first() } }
+    val z = y.map {
+        it.reversed().reduce { acc, i -> i - acc }
+    }
+    return z.sum()
 }
