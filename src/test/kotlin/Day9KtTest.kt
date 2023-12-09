@@ -5,7 +5,7 @@ class Day9KtTest : FunSpec({
     val fileContent1 = readFileAsLinesUsingUseLines("09_1.txt")
     test("day9_1") {
         val result = day9_1(fileContent1)
-        result.shouldBe(2)
+        result.shouldBe(114)
     }
 
     test("day9_2") {
