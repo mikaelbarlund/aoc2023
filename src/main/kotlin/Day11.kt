@@ -6,9 +6,9 @@ fun day11_1(fileContent: List<String>): Any {
         .fold(emptyList()) { acc: List<List<Char>>, it ->
             acc + if (it.any { c -> c != '.' }) listOf(it) else listOf(it, it)
         }
-    val expandXY = transpose(transpose(expandY).fold(emptyList()) { acc: List<List<Char>>, it ->
+    val expandXY = expandY.transpose().fold(emptyList()) { acc: List<List<Char>>, it ->
         acc + if (it.any { c -> c != '.' }) listOf(it) else listOf(it, it)
-    })
+    }.transpose()
     val galaxies = expandXY.foldIndexed(emptyList()) { x, a1: List<Pair<Int, Int>>, i1 ->
         a1 + i1.foldIndexed(emptyList()) { y, a2: List<Pair<Int, Int>>, i2 ->
             if (i2 == '#') a2 + listOf(Pair(x, y)) else a2
@@ -35,9 +35,9 @@ fun day11_2(fileContent: List<String>, factor: Long): Any {
         .fold(emptyList()) { acc: List<List<Char>>, it ->
             acc + if (it.any { c -> c != '.' }) listOf(it) else listOf(it.map { '@' })
         }
-    val expandXY = transpose(transpose(expandY).fold(emptyList()) { acc: List<List<Char>>, it ->
+    val expandXY = expandY.transpose().fold(emptyList()) { acc: List<List<Char>>, it ->
         acc + if (it.any { c -> c != '.' && c != '@' }) listOf(it) else listOf(it.map { '@' })
-    })
+    }.transpose()
     val galaxies = expandXY.foldIndexed(emptyList()) { x, a1: List<Pair<Int, Int>>, i1 ->
         a1 + i1.foldIndexed(emptyList()) { y, a2: List<Pair<Int, Int>>, i2 ->
             if (i2 == '#') a2 + listOf(Pair(x, y)) else a2
@@ -84,12 +84,12 @@ private fun evalDistance(it: Pair<Pair<Int, Int>, Pair<Int, Int>>, map: List<Lis
     return totalDistance
 }
 
-inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
-    val cols = xs[0].size
-    val rows = xs.size
+fun <T> List<List<T>>.transpose(): List<List<T>> {
+    val cols = this[0].size
+    val rows = this.size
     return List(cols) { j ->
         List(rows) { i ->
-            xs[i][j]
+            this[i][j]
         }
     }
 }

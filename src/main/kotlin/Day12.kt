@@ -47,4 +47,4 @@ fun unfoldPairs(fileContent: List<String>) = fileContent.map { it.split(" ") }
     .map { Pair(myRepeat(it[0], "?", 5), myRepeat(it[1], ",", 5).split(",").map { y -> y.toLong() }) }
 
 fun myRepeat(input: String, sep: String, count: Long): String =
-    (0..<count).map { input }.joinToString(separator = sep)
+    (0..<count).joinToString(separator = sep) { input }

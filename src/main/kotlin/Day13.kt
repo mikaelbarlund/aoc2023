@@ -25,7 +25,7 @@ tailrec fun findReflectionMemo(
             return if (transposed) {
                 Pair(-1, transposed)
             } else {
-                val transposedField = transpose(field)
+                val transposedField = field.transpose()
                 return findReflectionMemo(
                     field = transposedField,
                     transposed = true,
