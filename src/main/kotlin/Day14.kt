@@ -4,8 +4,8 @@ fun day14_1(fileContent: List<String>): Any {
     return x.map { it.mapIndexed { i1, it1 -> if (it1 == 'O') i1 + 1 else 0 } }.sumOf { it.sum() }
 }
 
-val cache14_2 = mutableMapOf<List<List<Char>>, List<List<Char>>>()
-fun List<List<Char>>.tiltAndSpin(): List<List<Char>> {
+private val cache14_2 = mutableMapOf<List<List<Char>>, List<List<Char>>>()
+private fun List<List<Char>>.tiltAndSpin(): List<List<Char>> {
     val result = cache14_2.getOrPut(this) {
         this
             .transpose()
@@ -16,8 +16,8 @@ fun List<List<Char>>.tiltAndSpin(): List<List<Char>> {
     return result
 }
 
-val cache14_3 = mutableMapOf<Int, List<List<Char>>>()
-fun List<List<Char>>.fullCycle(): List<List<Char>> {
+private val cache14_3 = mutableMapOf<Int, List<List<Char>>>()
+private fun List<List<Char>>.fullCycle(): List<List<Char>> {
     val result = cache14_3.getOrPut(this.hashCode()) {
         (0..<4).fold(this) { a, _ -> a.tiltAndSpin() }
     }
@@ -35,7 +35,7 @@ fun day14_2(fileContent: List<String>): Any {
 
 data class FirstHash(val found: Boolean, val hash: Int, val index: Int)
 
-tailrec fun doCycles(
+private tailrec fun doCycles(
     n: Long,
     x: List<List<Char>>,
     firstHash: FirstHash = FirstHash(false, 0, 0),
