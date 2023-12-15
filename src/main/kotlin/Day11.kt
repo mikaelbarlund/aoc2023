@@ -84,13 +84,3 @@ private fun evalDistance(it: Pair<Pair<Int, Int>, Pair<Int, Int>>, map: List<Lis
     return totalDistance
 }
 
-fun <T> List<List<T>>.transpose(): List<List<T>> {
-    val cols = this[0].size
-    val rows = this.size
-    return List(cols) { j ->
-        List(rows) { i ->
-            this[i][j]
-        }
-    }
-}
-
