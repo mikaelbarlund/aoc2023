@@ -15,6 +15,6 @@ class Day12KtTest : FunSpec({
 
     test("pairs") {
         val result = unfoldPairs(listOf(".# 1"))
-        result.shouldBe(listOf(Pair(".#?.#?.#?.#?.#", listOf(1, 1, 1, 1, 1))))
+        result.shouldBe(listOf(Pair(".#?.#?.#?.#?.#", listOf(1L, 1L, 1L, 1L, 1L))))
     }
 })
