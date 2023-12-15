@@ -15,3 +15,18 @@ fun <T> List<List<T>>.transpose(): List<List<T>> {
         }
     }
 }
+
+fun <T> List<T>.customBubbleSort(compare: (a: T, b: T) -> Boolean): List<T> {
+    val arr = this.toMutableList()
+    val n = arr.size
+    for (i in 0..<n - 1) {
+        for (j in 0..<n - i - 1) {
+            if (compare(arr[j], arr[j + 1])) {
+                val temp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = temp
+            }
+        }
+    }
+    return arr.toList()
+}

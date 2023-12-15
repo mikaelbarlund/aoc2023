@@ -10,7 +10,7 @@ fun List<List<Char>>.tiltAndSpin(): List<List<Char>> {
         this
             .transpose()
             .map {
-                it.day14bubbleSort().reversed()
+                it.customBubbleSort { a, b -> a == '.' && b == 'O' }.reversed()
             }
     }
     return result
@@ -54,30 +54,4 @@ tailrec fun doCycles(
         FirstHash(firstHash.found, firstHash.hash, if (firstHash.found) firstHash.index else firstHash.index + 1),
         if (firstHash.found) afterHash + listOf(x) else afterHash
     )
-}
-
-val cache14_1 = mutableMapOf<List<Char>, List<Char>>()
-
-fun List<Char>.day14bubbleSort(): List<Char> {
-    val result = cache14_1.getOrPut(this) {
-        val arr = this.toMutableList()
-        val n = arr.size
-        for (i in 0..<n - 1) {
-            for (j in 0..<n - i - 1) {
-                //if (arr[j] > arr[j + 1]) {
-                if (lessThan(arr[j], arr[j + 1])) {
-                    // Swap the elements
-                    val temp = arr[j]
-                    arr[j] = arr[j + 1]
-                    arr[j + 1] = temp
-                }
-            }
-        }
-        return arr.toList()
-    }
-    return result
-}
-
-private fun lessThan(a: Char, b: Char): Boolean {
-    return a == '.' && b == 'O'
 }
