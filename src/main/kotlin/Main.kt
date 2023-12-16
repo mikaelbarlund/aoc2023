@@ -1,7 +1,7 @@
 fun main() {
-    val fileContent = readFileAsLinesUsingUseLines("14.txt")
-    println(day14_1(fileContent))
-    println(day14_2(fileContent))
+    val fileContent = readFileAsLinesUsingUseLines("15.txt")
+    println(day15_1(fileContent))
+    println(day15_2(fileContent))
 }
 
 fun readFileAsLinesUsingUseLines(fileName: String): List<String> =
