@@ -5,7 +5,9 @@ fun List<String>.toCharMatrix(): List<List<Char>> {
 fun List<String>.toLongMatrix(): List<List<Long>> {
     return this.map { it.toList().map { long -> long.code.toLong() } }
 }
-
+fun List<String>.toIntMatrix(): List<List<Int>> {
+    return this.map { it.map { int -> int.digitToInt() } }
+}
 fun <T> List<List<T>>.transpose(): List<List<T>> {
     val cols = this[0].size
     val rows = this.size
