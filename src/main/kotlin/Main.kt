@@ -3,7 +3,7 @@ import kotlin.time.measureTime
 fun main() {
     val fileContent = readFileAsLinesUsingUseLines("17.txt")
     val timeTaken1 = measureTime {
-        println(day17_1(fileContent))
+       // println(day17_1(fileContent))
     }
     println(timeTaken1)
     val timeTaken2 = measureTime {

@@ -5,15 +5,33 @@ import kotlin.math.abs
 fun day17_1(fileContent: List<String>): Any {
     val grid = fileContent.toIntMatrix()
     val start = Point(0, 0, 'O', 0)
-    val goal = Point(grid[0].size - 1, grid.size - 1, 'O', 0)
-    val aStar = AStar(grid, start, goal)
+    val goal = Point(grid.size - 1, grid[0].size - 1, 'O', 0)
+    val aStar =
+        AStar(
+            grid,
+            start,
+            goal,
+            { a, b -> Pair(a.x, a.y) == Pair(b.x, b.y) },
+            ::getNeighbors
+        )
     val path = aStar.findPath()
     printPath(grid, path)
     return path.last().g
 }
 
 fun day17_2(fileContent: List<String>): Any {
-    return 1
+    val grid = fileContent.toIntMatrix()
+    val start = Point(0, 0, 'O', 0)
+    val goal = Point(grid.size - 1, grid[0].size - 1, 'O', 0)
+    val aStar = AStar(
+        grid, start, goal,
+        { a, b ->
+            Pair(a.x, a.y) == Pair(b.x, b.y) && a.len >= 4
+        }, ::getNeighbors2
+    )
+    val path = aStar.findPath()
+    printPath(grid, path)
+    return path.last().g
 }
 
 private fun printPath(
@@ -44,11 +62,17 @@ class Node(val point: Point, var parent: Node?, var g: Double, private var h: Do
     }
 
     override fun toString(): String {
-        return "(${point.x}, ${point.y} $g $h)"
+        return "(${point.x}, ${point.y} ${point.len} $g $h)"
     }
 }
 
-class AStar(private val grid: List<List<Int>>, private val start: Point, private val goal: Point) {
+class AStar(
+    private val grid: List<List<Int>>,
+    private val start: Point,
+    private val goal: Point,
+    private val isGoal: (Point, Point) -> Boolean,
+    val neighbourFunc: (List<List<Int>>, Point) -> List<Point>
+) {
 
     private val openSet: PriorityQueue<Node> = PriorityQueue(compareBy { it.f() })
     private val closedSet: MutableSet<Point> = mutableSetOf()
@@ -59,12 +83,11 @@ class AStar(private val grid: List<List<Int>>, private val start: Point, private
 
         while (openSet.isNotEmpty()) {
             val current = openSet.poll()
-            if (Pair(current.point.x, current.point.y) == Pair(goal.x, goal.y)) {
+            if (isGoal(current.point, goal)) {
                 return reconstructPath(current)
             }
-
             closedSet.add(current.point)
-            for (neighbor in getNeighbors(current.point)) {
+            for (neighbor in neighbourFunc(grid, current.point)) {
                 if (neighbor in closedSet) {
                     continue
                 }
@@ -97,28 +120,54 @@ class AStar(private val grid: List<List<Int>>, private val start: Point, private
         return (abs(a.x - b.x) + abs(a.y - b.y)).toDouble()
     }
 
-    private fun getNeighbors(point: Point): List<Point> {
-        val neighbors = mutableListOf<Point>()
-        val dir = point.dir
-        val len = point.len
-        if (dir != 'v' && point.x > 0 && (dir != '^' || len < 3)) {
-            //  turning up
-            neighbors.add(Point(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
-        }
-        if (dir != '^' && point.x < grid.size - 1 && (dir != 'v' || len < 3)) {
-            // turning down
-            neighbors.add(Point(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
-        }
-        if (dir != '>' && point.y > 0 && (dir != '<' || len < 3)) {
-            // turning left
-            neighbors.add(Point(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
-        }
-        if (dir != '<' && point.y < grid[0].size - 1 && (dir != '>' || len < 3)) {
-            // turning right
-            neighbors.add(Point(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
-        }
-        return neighbors
-    }
 
-    private fun Char.nextLen(dir: Char, len: Int) = if (this == dir) len + 1 else 1
+}
+
+private fun getNeighbors(grid: List<List<Int>>, point: Point): List<Point> {
+    val neighbors = mutableListOf<Point>()
+    val dir = point.dir
+    val len = point.len
+    if (dir != 'v' && point.x > 0 && (dir != '^' || len < 3)) {
+        //  turning up
+        neighbors.add(Point(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
+    }
+    if (dir != '^' && point.x < grid.size - 1 && (dir != 'v' || len < 3)) {
+        // turning down
+        neighbors.add(Point(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
+    }
+    if (dir != '>' && point.y > 0 && (dir != '<' || len < 3)) {
+        // turning left
+        neighbors.add(Point(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
+    }
+    if (dir != '<' && point.y < grid[0].size - 1 && (dir != '>' || len < 3)) {
+        // turning right
+        neighbors.add(Point(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
+    }
+    return neighbors
+}
+
+private fun Char.nextLen(dir: Char, len: Int) = if (this == dir) len + 1 else 1
+
+
+private fun getNeighbors2(grid: List<List<Int>>, point: Point): List<Point> {
+    val neighbors = mutableListOf<Point>()
+    val dir = point.dir
+    val len = point.len
+    if (dir != 'v' && point.x > 0 && (dir != '^' || len < 10) && (dir == 'O' || dir == '^' || len >= 4)) {
+        //  turning up
+        neighbors.add(Point(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
+    }
+    if (dir != '^' && point.x < grid.size - 1 && (dir != 'v' || len < 10) && (dir == 'O' || dir == 'v' || len >= 4)) {
+        // turning down
+        neighbors.add(Point(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
+    }
+    if (dir != '>' && point.y > 0 && (dir != '<' || len < 10) && (dir == 'O' || dir == '<' || len >= 4)) {
+        // turning left
+        neighbors.add(Point(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
+    }
+    if (dir != '<' && point.y < grid[0].size - 1 && (dir != '>' || len < 10) && (dir == 'O' || dir == '>' || len >= 4)) {
+        // turning right
+        neighbors.add(Point(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
+    }
+    return neighbors
 }
