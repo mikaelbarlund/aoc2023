@@ -4,8 +4,8 @@ import kotlin.math.abs
 
 fun day17_1(fileContent: List<String>): Any {
     val grid = fileContent.toIntMatrix()
-    val start = Point(0, 0, 'O', 0)
-    val goal = Point(grid.size - 1, grid[0].size - 1, 'O', 0)
+    val start = PointWithDirection(0, 0, 'O', 0)
+    val goal = PointWithDirection(grid.size - 1, grid[0].size - 1, 'O', 0)
     val aStar =
         AStar(
             grid,
@@ -21,8 +21,8 @@ fun day17_1(fileContent: List<String>): Any {
 
 fun day17_2(fileContent: List<String>): Any {
     val grid = fileContent.toIntMatrix()
-    val start = Point(0, 0, 'O', 0)
-    val goal = Point(grid.size - 1, grid[0].size - 1, 'O', 0)
+    val start = PointWithDirection(0, 0, 'O', 0)
+    val goal = PointWithDirection(grid.size - 1, grid[0].size - 1, 'O', 0)
     val aStar = AStar(
         grid, start, goal,
         { a, b ->
@@ -53,10 +53,10 @@ private fun printPath(
 }
 
 
-data class Point(val x: Int, val y: Int, val dir: Char, val len: Int)
+data class PointWithDirection(val x: Int, val y: Int, val dir: Char, val len: Int)
 
 
-class Node(val point: Point, var parent: Node?, var g: Double, private var h: Double) {
+class Node(val point: PointWithDirection, var parent: Node?, var g: Double, private var h: Double) {
     fun f(): Double {
         return g + h
     }
@@ -68,14 +68,14 @@ class Node(val point: Point, var parent: Node?, var g: Double, private var h: Do
 
 class AStar(
     private val grid: List<List<Int>>,
-    private val start: Point,
-    private val goal: Point,
-    private val isGoal: (Point, Point) -> Boolean,
-    val neighbourFunc: (List<List<Int>>, Point) -> List<Point>
+    private val start: PointWithDirection,
+    private val goal: PointWithDirection,
+    private val isGoal: (PointWithDirection, PointWithDirection) -> Boolean,
+    val neighbourFunc: (List<List<Int>>, PointWithDirection) -> List<PointWithDirection>
 ) {
 
     private val openSet: PriorityQueue<Node> = PriorityQueue(compareBy { it.f() })
-    private val closedSet: MutableSet<Point> = mutableSetOf()
+    private val closedSet: MutableSet<PointWithDirection> = mutableSetOf()
 
     fun findPath(): List<Node> {
         val startNode = Node(start, null, 0.0, heuristic(start, goal))
@@ -116,32 +116,32 @@ class AStar(
         return path.reversed()
     }
 
-    private fun heuristic(a: Point, b: Point): Double {
+    private fun heuristic(a: PointWithDirection, b: PointWithDirection): Double {
         return (abs(a.x - b.x) + abs(a.y - b.y)).toDouble()
     }
 
 
 }
 
-private fun getNeighbors(grid: List<List<Int>>, point: Point): List<Point> {
-    val neighbors = mutableListOf<Point>()
+private fun getNeighbors(grid: List<List<Int>>, point: PointWithDirection): List<PointWithDirection> {
+    val neighbors = mutableListOf<PointWithDirection>()
     val dir = point.dir
     val len = point.len
     if (dir != 'v' && point.x > 0 && (dir != '^' || len < 3)) {
         //  turning up
-        neighbors.add(Point(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
     }
     if (dir != '^' && point.x < grid.size - 1 && (dir != 'v' || len < 3)) {
         // turning down
-        neighbors.add(Point(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
     }
     if (dir != '>' && point.y > 0 && (dir != '<' || len < 3)) {
         // turning left
-        neighbors.add(Point(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
     }
     if (dir != '<' && point.y < grid[0].size - 1 && (dir != '>' || len < 3)) {
         // turning right
-        neighbors.add(Point(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
     }
     return neighbors
 }
@@ -149,25 +149,25 @@ private fun getNeighbors(grid: List<List<Int>>, point: Point): List<Point> {
 private fun Char.nextLen(dir: Char, len: Int) = if (this == dir) len + 1 else 1
 
 
-private fun getNeighbors2(grid: List<List<Int>>, point: Point): List<Point> {
-    val neighbors = mutableListOf<Point>()
+private fun getNeighbors2(grid: List<List<Int>>, point: PointWithDirection): List<PointWithDirection> {
+    val neighbors = mutableListOf<PointWithDirection>()
     val dir = point.dir
     val len = point.len
     if (dir != 'v' && point.x > 0 && (dir != '^' || len < 10) && (dir == 'O' || dir == '^' || len >= 4)) {
         //  turning up
-        neighbors.add(Point(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x - 1, point.y, '^', '^'.nextLen(dir, len)))
     }
     if (dir != '^' && point.x < grid.size - 1 && (dir != 'v' || len < 10) && (dir == 'O' || dir == 'v' || len >= 4)) {
         // turning down
-        neighbors.add(Point(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x + 1, point.y, 'v', 'v'.nextLen(dir, len)))
     }
     if (dir != '>' && point.y > 0 && (dir != '<' || len < 10) && (dir == 'O' || dir == '<' || len >= 4)) {
         // turning left
-        neighbors.add(Point(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x, point.y - 1, '<', '<'.nextLen(dir, len)))
     }
     if (dir != '<' && point.y < grid[0].size - 1 && (dir != '>' || len < 10) && (dir == 'O' || dir == '>' || len >= 4)) {
         // turning right
-        neighbors.add(Point(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
+        neighbors.add(PointWithDirection(point.x, point.y + 1, '>', '>'.nextLen(dir, len)))
     }
     return neighbors
 }
